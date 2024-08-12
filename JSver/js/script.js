@@ -24,7 +24,7 @@ async function getQuotes() {
     newQuote();
   } catch (error) {
     // エラー処理
-    console.log(error);
+    console.error("error", error);
   }
 }
 
@@ -37,18 +37,17 @@ function newQuote() {
   const quote = apiQuotes[Math.floor(Math.random() * apiQuotes.length)];
   // Check if Author field is blank and replace it with 'Unknown'
   // 著者がnullかどうかをチェックする
-  if (!quote.author) {
-    authorTxt.textContent = UNKNOWN;
-  } else {
-    authorTxt.textContent = quote.author;
-  }
+  !quote.author
+    ? (authorTxt.textContent = UNKNOWN)
+    : (authorTxt.textContent = quote.author);
+
   // Check Quote length to determine sytyling
   // 引用文の長さに応じてスタイルを変更する
-  if (quote.text.length > QUOTE_STYLE_CHANGE_NUM) {
-    quoteTxt.classList.add("long-quote");
-  } else {
-    quoteTxt.classList.remove("long-quote");
-  }
+  const isTooLong = quote.text.length > QUOTE_STYLE_CHANGE_NUM;
+  isTooLong
+    ? quoteTxt.classList.add("long-quote")
+    : quoteTxt.classList.remove("long-quote");
+
   quoteTxt.textContent = quote.text;
   complete();
 }
