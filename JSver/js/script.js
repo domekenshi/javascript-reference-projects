@@ -4,6 +4,7 @@ const quoteTxt = document.getElementById("quote");
 const authorTxt = document.getElementById("author");
 const twitterBtn = document.getElementById("twitter");
 const newQuoteBtn = document.getElementById("new-quote");
+const loader = document.getElementById("loader");
 
 let apiQuotes = [];
 
@@ -14,6 +15,7 @@ const QUOTE_STYLE_CHANGE_NUM = 50;
  * 引用文取得
  */
 async function getQuotes() {
+  loading();
   const apiUrl = API_URL;
   try {
     let response = await fetch(apiUrl);
@@ -30,6 +32,7 @@ async function getQuotes() {
  * 新規引用文生成
  */
 function newQuote() {
+  loading();
   // Pick a random quote from apiQuotes array ランダムに引用文配列から引用を取得
   const quote = apiQuotes[Math.floor(Math.random() * apiQuotes.length)];
   // Check if Author field is blank and replace it with 'Unknown'
@@ -47,6 +50,7 @@ function newQuote() {
     quoteTxt.classList.remove("long-quote");
   }
   quoteTxt.textContent = quote.text;
+  complete();
 }
 
 /**
@@ -57,6 +61,14 @@ function tweetQuote() {
   window.open(twitterUrl, "_blank");
 }
 
+function loading() {
+  loader.hidden = false;
+  quoteContainer.hidden = true;
+}
+function complete() {
+  quoteContainer.hidden = false;
+  loader.hidden = true;
+}
 newQuoteBtn.addEventListener("click", newQuote);
 twitterBtn.addEventListener("click", tweetQuote);
 
