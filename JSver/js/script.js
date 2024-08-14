@@ -3,6 +3,9 @@ import { API_INFO } from "./const.js";
 const imageContainer = document.getElementById("image-container");
 const loader = document.getElementById("loader");
 
+let ready = false;
+let imagesLoaded = 0;
+let toatalImages = 0;
 let photos = [];
 const COUNT = 10;
 // 分けてみたけどわかりにくい　一応そのまま
@@ -13,7 +16,9 @@ const apiUrl = `${API_INFO.BASE_PI_URL}${API_INFO.CLIENT_ID}${API_INFO.API_KEY}$
 async function getPhotes() {
   try {
     const response = await fetch(apiUrl);
+    console.log(response);
     photos = await response.json();
+
     displayPhotes();
   } catch (error) {
     console.error(error);
@@ -24,6 +29,7 @@ async function getPhotes() {
  * 写真表示
  */
 function displayPhotes() {
+  toatalImages = photos.length;
   photos.forEach((photo) => {
     // <a>タグを作成
     const item = document.createElement("a");
@@ -38,6 +44,7 @@ function displayPhotes() {
       alt: photo.alt_description,
       title: photo.alt_description,
     });
+    img.addEventListener("load", imageLoaded);
     // 親子関係の設定
     item.appendChild(img);
     imageContainer.appendChild(item);
@@ -52,5 +59,24 @@ function setAttribute(element, attributes) {
     element.setAttribute(key, attributes[key]);
   }
 }
+
+function imageLoaded() {
+  imagesLoaded++;
+  if (imagesLoaded === toatalImages) {
+    ready = true;
+    loader.hidden = true;
+  }
+}
+window.addEventListener("scroll", () => {
+  if (
+    window.innerHeight + window.scrollY >= document.body.offsetHeight - 1000 &&
+    ready
+  ) {
+    imagesLoaded = 0;
+    ready = false;
+
+    getPhotes();
+  }
+});
 
 getPhotes();
