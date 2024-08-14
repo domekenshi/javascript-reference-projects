@@ -1,4 +1,5 @@
 import { API_INFO } from "./const.js";
+import { setAttribute } from "./util.js";
 
 const imageContainer = document.getElementById("image-container");
 const loader = document.getElementById("loader");
@@ -7,21 +8,23 @@ let ready = false;
 let imagesLoaded = 0;
 let toatalImages = 0;
 let photos = [];
-const COUNT = 10;
+// 初期表示を少なくする
+let count = 3;
 // 分けてみたけどわかりにくい　一応そのまま
-const apiUrl = `${API_INFO.BASE_PI_URL}${API_INFO.CLIENT_ID}${API_INFO.API_KEY}${API_INFO.COUNT}${COUNT}`;
+let apiUrl = `${API_INFO.BASE_PI_URL}${API_INFO.CLIENT_ID}${API_INFO.API_KEY}${API_INFO.COUNT}${count}`;
+
 /**
  * 写真取得
  */
 async function getPhotes() {
   try {
+    // APIからデータを取得
     const response = await fetch(apiUrl);
-    console.log(response);
     photos = await response.json();
 
     displayPhotes();
   } catch (error) {
-    console.error(error);
+    console.error("エラー：", error);
   }
 }
 
@@ -44,6 +47,7 @@ function displayPhotes() {
       alt: photo.alt_description,
       title: photo.alt_description,
     });
+    // 画像読込時のイベント
     img.addEventListener("load", imageLoaded);
     // 親子関係の設定
     item.appendChild(img);
@@ -52,21 +56,23 @@ function displayPhotes() {
 }
 
 /**
- * HTML要素に属性を設定
+ * 画像読込
  */
-function setAttribute(element, attributes) {
-  for (const key in attributes) {
-    element.setAttribute(key, attributes[key]);
-  }
-}
-
 function imageLoaded() {
+  // 読込数加算
   imagesLoaded++;
+  // 読込完了処理
   if (imagesLoaded === toatalImages) {
     ready = true;
     loader.hidden = true;
+    let count = 10;
+    apiUrl = `${API_INFO.BASE_PI_URL}${API_INFO.CLIENT_ID}${API_INFO.API_KEY}${API_INFO.COUNT}${count}`;
   }
 }
+
+/**
+ * スクロールイベントの設定
+ */
 window.addEventListener("scroll", () => {
   if (
     window.innerHeight + window.scrollY >= document.body.offsetHeight - 1000 &&
@@ -74,7 +80,6 @@ window.addEventListener("scroll", () => {
   ) {
     imagesLoaded = 0;
     ready = false;
-
     getPhotes();
   }
 });
